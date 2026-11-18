@@ -136,6 +136,40 @@ main#v{max-width:none;margin:0;padding:0;min-height:70vh}
  .hero-inner{background:linear-gradient(90deg,rgba(8,38,32,.22),transparent)}
 }
 </style>
+
+<style id="darul-quran-blue-white-theme">
+:root{--p-green:#123E78;--p-green2:#2367A5;--p-gold:#75B9EE;--p-cream:#F3F7FC;--p-ink:#1C2D42;--p-muted:#62758A;--p-line:#DCE7F2}
+body{background:linear-gradient(145deg,#f8fbff 0%,#edf4fc 48%,#fff 100%);color:#1c2d42}
+.portal-header{background:linear-gradient(110deg,#fff 0%,#f1f7ff 100%)}
+.portal-topline{background:linear-gradient(90deg,#123E78,#286EAF);color:#eaf4ff}
+.portal-brand{color:#123E78}
+.portal-brand small{color:#66809b}
+.admin-entry{border-color:#c9dced;color:#174d83;background:#fff}
+.admin-entry:hover{background:#edf6ff;border-color:#75B9EE}
+.portal-nav{background:#fff;border-color:#dce7f2}
+.portal-nav a{color:#506984}
+.portal-nav a:hover,.portal-nav a.on{color:#123E78;background:#edf5fd;border-bottom-color:#75B9EE}
+.hero{background-image:linear-gradient(90deg,rgba(7,39,82,.92) 0%,rgba(16,70,126,.79) 50%,rgba(18,62,120,.43) 100%),url("darul-quran-campus.jpg")}
+.hero-kicker{color:#c8e5ff}
+.hero-stats strong{color:#d6ecff}
+.btn-gold{background:#d9edff;color:#123e78}
+.btn-outline{border-color:#d6eaff;color:#fff}
+.quick-icon{background:#eaf3fc;color:#174d83}
+.quick-card a{color:#2367a5}
+.public-band{background:linear-gradient(115deg,#eaf3fc,#f7faff)}
+.section-head h2,.quick-card h3,.info-card h3{color:#123E78}
+.eyebrow{color:#3679b6}
+.search-panel,.quick-card,.info-card,.about-panel,.login-card{border-color:#dce7f2;box-shadow:0 10px 30px #164a8010}
+.search-form input,.login-card input{border-color:#cfdeed}
+.class-pill{background:#eaf3fc;color:#174d83}
+.admin-welcome{background:linear-gradient(110deg,#123E78,#2c78ba)}
+.admin-menu a{color:#174d83;border-color:#dce7f2}
+.admin-primary,#v button:not(.alt):not(.del){background:#174d83;color:white}
+#v .card{border-color:#dce7f2}
+.portal-footer{background:linear-gradient(100deg,#0d315f,#174d83);color:#e4f1ff}
+.login-hint{background:#eff6fd;color:#536e89}
+@media(max-width:700px){.hero{background-position:center center}}
+</style>
 </head>
 <body>
 <header class="portal-header noprint">
@@ -253,11 +287,17 @@ const portalPublicNav = `<a href="#beranda">Beranda</a><a href="#informasi">Info
 let portalAdminSession = sessionStorage.getItem('dq-admin-session') === 'active';
 function portalFooter(){return `<footer class="portal-footer"><div class="portal-wrap footer-inner"><span><b>MTSS PON-PES DARUL QUR’AN</b><br>Yayasan Islamic Centre Darul Qur’an</span><span>Portal Akademik Madrasah · ${new Date().getFullYear()}</span></div></footer>`}
 function portalFrame(content){V.innerHTML=content+portalFooter()}
-function portalAdminNav(){return `<div class="admin-menu"><a href="#santri">Data Santri</a><a href="#mapel">Mata Pelajaran</a><a href="#nilai">Input Nilai</a><a href="#raport">Cetak Raport</a><a href="#atur">Pengaturan</a><button class="logout-btn" id="portalLogout">Keluar</button></div>`}
+function portalAdminNav(){return `<div class="admin-menu"><a href="#santri">Data Santri</a><a href="#mapel">Mata Pelajaran</a><a href="#nilai">Input Nilai</a><a href="#raport">Cetak Raport</a><a href="#atur">Pengaturan</a><a href="#akun">Pengaturan Akun</a><button class="logout-btn" id="portalLogout">Keluar</button></div>`}
+function portalGetAdminCredentials(){
+  try{return JSON.parse(localStorage.getItem('dq-admin-credentials'))||{username:'admin',password:'admin123'}}catch(e){return{username:'admin',password:'admin123'}}
+}
+function portalSetAdminCredentials(username,password){
+  localStorage.setItem('dq-admin-credentials',JSON.stringify({username,password}));
+}
 function portalLogin(){
   document.querySelector('#nav').innerHTML=portalPublicNav;
-  portalFrame(`<div class="login-wrap"><div class="login-card"><div class="eyebrow">Area terbatas</div><h2>Masuk Administrator</h2><p style="font-size:12px;color:#718078;line-height:1.8">Silakan masuk untuk mengelola data santri, nilai, mata pelajaran, dan raport.</p><form id="portalLoginForm"><label>Username</label><input name="username" autocomplete="username" required placeholder="Username admin"><label>Password</label><input name="password" type="password" autocomplete="current-password" required placeholder="Password"><button class="admin-primary" type="submit">Masuk ke Dashboard</button></form><div class="login-hint">Mode pratinjau lokal: username <b>admin</b> dan password <b>admin123</b>. Login ini belum aman untuk website publik. Autentikasi server akan dipasang setelah integrasi database.</div></div></div>`);
-  document.querySelector('#portalLoginForm').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);if(d.get('username')==='admin'&&d.get('password')==='admin123'){portalAdminSession=true;sessionStorage.setItem('dq-admin-session','active');location.hash='#dashboard'}else alert('Username atau password tidak sesuai.')};
+  portalFrame(`<div class="login-wrap"><div class="login-card"><div class="eyebrow">Area terbatas</div><h2>Masuk Administrator</h2><p style="font-size:12px;color:#718078;line-height:1.8">Silakan masuk untuk mengelola data santri, nilai, mata pelajaran, dan raport.</p><form id="portalLoginForm"><label>Username</label><input name="username" autocomplete="username" required placeholder="Username admin"><label>Password</label><input name="password" type="password" autocomplete="current-password" required placeholder="Password"><button class="admin-primary" type="submit">Masuk ke Dashboard</button></form><div class="login-hint">Login pratinjau lokal. Kredensial awal: <b>admin</b> / <b>admin123</b>. Setelah masuk, ganti melalui menu Pengaturan Akun. Sistem ini masih lokal dan belum aman untuk website publik.</div></div></div>`);
+  document.querySelector('#portalLoginForm').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);const cred=portalGetAdminCredentials();if(d.get('username')===cred.username&&d.get('password')===cred.password){portalAdminSession=true;sessionStorage.setItem('dq-admin-session','active');location.hash='#dashboard'}else alert('Username atau password tidak sesuai.')};
 }
 function portalHome(){
  document.querySelector('#nav').innerHTML=portalPublicNav;
@@ -269,6 +309,23 @@ function portalInfo(){document.querySelector('#nav').innerHTML=portalPublicNav;p
 function portalAbout(){document.querySelector('#nav').innerHTML=portalPublicNav;portalFrame(`<div class="portal-wrap-main"><div class="section-head"><div class="eyebrow">Tentang madrasah</div><h2>MTSS PON-PES DARUL QUR’AN</h2><p>Yayasan Islamic Centre Darul Qur’an · Pondok Pesantren Tahfizh</p></div><div class="about-panel"><h3 style="font:600 23px 'Source Serif 4';color:var(--p-green)">Pendidikan yang memadukan ilmu, Al-Qur’an, dan akhlak.</h3><p style="font-size:13px;line-height:2;color:#64736b">MTSS PON-PES DARUL QUR’AN merupakan lembaga pendidikan madrasah dan pesantren yang berkomitmen membina generasi berilmu, beradab, serta dekat dengan Al-Qur’an.</p><p style="font-size:12px;line-height:1.9;color:#64736b">Informasi profil rinci, visi, misi, sejarah, dan fasilitas dapat dilengkapi sesuai data resmi madrasah pada tahap finalisasi konten.</p></div></div>`)}
 function portalSearch(){document.querySelector('#nav').innerHTML=portalPublicNav;portalFrame(`<div class="portal-wrap-main"><div class="search-shell"><div class="section-head"><div class="eyebrow">Layanan akademik publik</div><h2>Pencarian Data Siswa</h2><p>Masukkan nama siswa untuk melihat informasi dasar kelas.</p></div><div class="search-panel"><form class="search-form" id="portalSearchForm"><input id="portalSearchInput" type="search" placeholder="Ketik nama siswa..." autocomplete="off" aria-label="Cari nama siswa"><button type="submit">Cari Siswa</button></form><div class="search-note">Hasil pencarian publik hanya menampilkan nama, jenis kelamin, dan kelas. Nilai raport, absensi, dan data pribadi lainnya tidak ditampilkan.</div><div id="portalSearchResults" class="search-results"></div></div></div></div>`);
  document.querySelector('#portalSearchForm').onsubmit=e=>{e.preventDefault();const q=document.querySelector('#portalSearchInput').value.trim().toLocaleLowerCase('id');const out=document.querySelector('#portalSearchResults');if(q.length<2){out.innerHTML='<p class="search-note">Masukkan minimal 2 karakter nama siswa.</p>';return}const found=(S.santri||[]).filter(s=>(s.nama||'').toLocaleLowerCase('id').includes(q));out.innerHTML=found.length?found.map(s=>`<div class="student-result"><div><strong>${esc(s.nama||'')}</strong><small>Jenis kelamin: ${esc(s.jk||s.jenisKelamin||'Belum diisi')}</small></div><span class="class-pill">${esc(s.kelas||'Kelas belum ditentukan')}</span></div>`).join(''):'<p class="search-note">Data siswa tidak ditemukan.</p>'};
+}
+function portalAccountSettings(){
+ document.querySelector('#nav').innerHTML=portalPublicNav;
+ const cred=portalGetAdminCredentials();
+ portalFrame(`<div class="admin-shell"><div class="admin-welcome"><div class="eyebrow" style="color:#d6ecff">Keamanan akun</div><h2>Pengaturan Akun Admin</h2><p>Perbarui username dan password administrator.</p></div>${portalAdminNav()}<div class="login-card" style="max-width:650px;margin:0 auto"><h2>Ganti Username & Password</h2><p style="font-size:12px;color:#62758A;line-height:1.8">Masukkan password saat ini sebagai verifikasi, kemudian isi username dan password baru.</p><form id="portalAccountForm"><label>Username saat ini</label><input value="${esc(cred.username)}" disabled><label>Password saat ini</label><input name="currentPassword" type="password" required autocomplete="current-password"><label>Username baru</label><input name="newUsername" required minlength="3" value="${esc(cred.username)}" autocomplete="username"><label>Password baru</label><input name="newPassword" type="password" minlength="8" placeholder="Minimal 8 karakter" required autocomplete="new-password"><label>Konfirmasi password baru</label><input name="confirmPassword" type="password" minlength="8" placeholder="Ulangi password baru" required autocomplete="new-password"><button class="admin-primary" type="submit" style="width:100%;padding:13px;margin-top:18px">Simpan Perubahan</button></form><div class="login-hint"><b>Penting:</b> perubahan ini hanya tersimpan di browser/perangkat yang digunakan (localStorage). Jika data browser dihapus atau memakai perangkat lain, kredensial tidak ikut berpindah. Saat integrasi Supabase/server, fitur ini akan diganti autentikasi server yang aman.</div></div></div>`);
+ document.querySelector('#portalAccountForm').onsubmit=e=>{
+  e.preventDefault();const d=new FormData(e.target),current=portalGetAdminCredentials();
+  const old=d.get('currentPassword'),u=d.get('newUsername').trim(),pw=d.get('newPassword'),confirmPw=d.get('confirmPassword');
+  if(old!==current.password){alert('Password saat ini tidak benar.');return}
+  if(u.length<3){alert('Username minimal 3 karakter.');return}
+  if(pw.length<8){alert('Password baru minimal 8 karakter.');return}
+  if(pw!==confirmPw){alert('Konfirmasi password baru tidak sama.');return}
+  portalSetAdminCredentials(u,pw);
+  alert('Username dan password berhasil diperbarui di browser ini. Silakan login kembali menggunakan kredensial baru.');
+  portalAdminSession=false;sessionStorage.removeItem('dq-admin-session');location.hash='#admin';
+ };
+ const logout=document.querySelector('#portalLogout');if(logout)logout.onclick=()=>{portalAdminSession=false;sessionStorage.removeItem('dq-admin-session');location.hash='#beranda'};
 }
 function portalDashboard(){
  document.querySelector('#nav').innerHTML=portalPublicNav;
@@ -287,10 +344,11 @@ render=function(){
   return portalLogin();
  }
  if(route==='dashboard'&&!portalAdminSession){location.hash='#admin';return}
- if(['santri','mapel','nilai','raport','atur','dashboard'].includes(route)){
+ if(['santri','mapel','nilai','raport','atur','dashboard','akun'].includes(route)){
   if(!portalAdminSession){location.hash='#admin';return}
   document.querySelector('#nav').innerHTML=portalPublicNav;
   if(route==='dashboard')return portalDashboard();
+  if(route==='akun')return portalAccountSettings();
   portalOriginalRender();
   const adminBanner=document.createElement('div');adminBanner.className='admin-welcome';adminBanner.innerHTML=`<div class="eyebrow" style="color:#e2c98e">Area administrator</div><h2>Pengelolaan Akademik</h2><p>Data lengkap hanya tersedia setelah masuk sebagai admin.</p>`;
   const adminNav=document.createElement('div');adminNav.className='admin-shell';adminNav.style.paddingBottom='0';adminNav.innerHTML=portalAdminNav();
