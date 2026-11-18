@@ -188,13 +188,55 @@ body{background:linear-gradient(145deg,#f8fbff 0%,#edf4fc 48%,#fff 100%);color:#
 const K='raport-darulquran-v1',$=s=>document.querySelector(s);
 const uid=()=>Math.random().toString(36).slice(2,9);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dm=[['Pendidikan Kewarganegaraan','Nasional','التربية الوطنية'],['Bahasa Indonesia','Nasional','اللغة الاندونيسية'],['Bahasa Inggris','Nasional','اللغة الانجليزية'],['Matematika','Nasional','الرياضية'],['Ilmu Pengetahuan Alam','Nasional','العلوم العالمية'],['Ilmu Pengetahuan Sosial','Nasional','العلوم الاجتماعية'],['Seni Budaya','Nasional','الفن والثقافة'],['Penjaskes','Nasional','التربية الجسمانية والرياضة الصحية'],['Al-Qur’an dan Tajwid','Keagamaan','القرآن و التجويد'],['Hadits','Keagamaan','الحديث'],['Tauhid','Keagamaan','التوحيد'],['Akhlak','Keagamaan','الاخلاق'],['Fiqih','Keagamaan','الفقه'],['Tarekh','Keagamaan','التاريخ'],['Mahfuzhat','Keagamaan','المحفوظات'],['Tahfizh','Keagamaan','تحفيظ'],['Nahwu','Bahasa','النحو'],['Shorof','Bahasa','الصرف'],['Muthala’ah','Bahasa','المطالعة'],['Bahasa Arab (Muhadatsah)','Bahasa','المحادثة'],['Imla’','Bahasa','املاء']];
+const dm=[['Pendidikan Kewarganegaraan','Nasional','التربية الوطنية'],['Bahasa Indonesia','Nasional','اللغة الإندونيسية'],['Bahasa Inggris','Nasional','اللغة الإنجليزية'],['Matematika','Nasional','الرياضيات'],['Ilmu Pengetahuan Alam','Nasional','العلوم الطبيعية'],['Ilmu Pengetahuan Sosial','Nasional','العلوم الاجتماعية'],['TIK','Nasional','تقنية المعلومات والاتصالات'],['Qur’an Hadist/Tajwid','Keagamaan','القرآن والحديث والتجويد'],['Tauhid','Keagamaan','التوحيد'],['Aqidah Akhlak/Akhlak','Keagamaan','العقيدة والأخلاق'],['Fiqih','Keagamaan','الفقه'],['Sejarah Kebudayaan Islam/Tarekh','Keagamaan','تاريخ الحضارة الإسلامية'],['Ilmu Faraid','Keagamaan','علم الفرائض'],['Mahfuzhat','Keagamaan','المحفوظات'],['Nahwu','Bahasa','النحو'],['Shorof','Bahasa','الصرف'],['Muthala’ah','Bahasa','المطالعة'],['Bahasa Arab','Bahasa','اللغة العربية'],['Muhadatsah','Bahasa','المحادثة'],['Imla’','Bahasa','الإملاء']];
 const D=()=>({set:{ta:'2026/2027',sem:'Ganjil',kepala:'',nip:'',tempat:'Deli Serdang',tgl:'',wali:{}},santri:[],rombel:[{t:'VII',n:'VII A'},{t:'VIII',n:'VIII A'},{t:'IX',n:'IX A'}],mapel:dm.map(m=>({id:uid(),nama:m[0],kat:m[1],ar:m[2],kkm:70})),nilai:{}});
 let S;try{S=Object.assign(D(),JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){S=D()}
+
 if(S.mapel.some(m=>m.kat==='Diniyah'||m.kat==='Umum'))S.mapel=D().mapel;
+if(!S._subjectsV3){
+ const aliases={
+  'Pendidikan Kewarganegaraan':['Pendidikan Kewarganegaraan'],
+  'Bahasa Indonesia':['Bahasa Indonesia'],'Bahasa Inggris':['Bahasa Inggris'],
+  'Matematika':['Matematika'],'Ilmu Pengetahuan Alam':['Ilmu Pengetahuan Alam'],
+  'Ilmu Pengetahuan Sosial':['Ilmu Pengetahuan Sosial'],'TIK':['TIK'],
+  'Qur’an Hadist/Tajwid':['Qur’an Hadist/Tajwid','Al-Qur’an dan Tajwid','Hadits'],
+  'Tauhid':['Tauhid'],'Aqidah Akhlak/Akhlak':['Aqidah Akhlak/Akhlak','Aqidah Akhlak','Akhlak'],
+  'Fiqih':['Fiqih'],'Sejarah Kebudayaan Islam/Tarekh':['Sejarah Kebudayaan Islam/Tarekh','Sejarah Kebudayaan Islam','Tarekh'],
+  'Ilmu Faraid':['Ilmu Faraid'],'Mahfuzhat':['Mahfuzhat'],'Nahwu':['Nahwu'],'Shorof':['Shorof'],
+  'Muthala’ah':['Muthala’ah'],'Bahasa Arab':['Bahasa Arab','Bahasa Arab (Muhadatsah)'],'Muhadatsah':['Muhadatsah'],'Imla’':['Imla’']
+ };
+ const previous=S.mapel||[], next=[], idMap={};
+ dm.forEach(def=>{
+  const matches=previous.filter(m=>(aliases[def[0]]||[def[0]]).includes(m.nama));
+  const targetId=matches[0]?.id||uid();
+  next.push({id:targetId,nama:def[0],kat:def[1],ar:def[2],kkm:matches[0]?.kkm??70});
+  matches.forEach(m=>idMap[m.id]=targetId);
+ });
+ Object.values(S.nilai||{}).forEach(rec=>{
+  if(!rec||!rec.n)return;
+  const grouped={};
+  Object.entries(idMap).forEach(([oldId,newId])=>{
+   const score=rec.n[oldId];if(!score)return;
+   (grouped[newId]??=[]).push(score);
+  });
+  Object.entries(grouped).forEach(([newId,items])=>{
+   const merged={};
+   [...new Set(items.flatMap(x=>Object.keys(x||{})))].forEach(k=>{
+    const vals=items.map(x=>x?.[k]).filter(v=>v!==null&&v!==undefined&&v!=='');
+    if(vals.length&&vals.every(v=>!isNaN(Number(v))))merged[k]=Math.round(vals.reduce((a,v)=>a+Number(v),0)/vals.length);
+    else if(vals.length)merged[k]=vals[0];
+   });
+   rec.n[newId]=merged;
+  });
+  Object.keys(idMap).forEach(oldId=>{if(oldId!==idMap[oldId])delete rec.n[oldId]});
+ });
+ S.mapel=next;S._subjectsV3=true;localStorage.setItem(K,JSON.stringify(S));
+}
+
 const save=()=>localStorage.setItem(K,JSON.stringify(S));
 const key=id=>`${S.set.ta}|${S.set.sem}|${id}`,num=x=>x===''||x==null?null:+x,f=x=>x==null?'':x;
 const avg=a=>{a=a.filter(x=>x!=null);return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):null};
+const arNum=n=>String(n??'').replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[Number(d)]);
 const pred=n=>n>=90?'A':n>=80?'B':n>=70?'C':'D',SK={A:'Sangat Baik',B:'Baik',C:'Cukup',D:'Kurang'};
 const AK={A:'ممتاز',B:'جيد',C:'مقبول',D:'ضعيف'},KAT={Nasional:'A. Kurikulum Nasional',Keagamaan:'B.1 Ilmu-Ilmu Keagamaan',Bahasa:'B.2 Ilmu-Ilmu Bahasa'},EK=['Pramuka','Pencak Silat'];
 const sa=['nol','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan','sepuluh','sebelas'],tb=n=>n<12?sa[n]:n<20?sa[n-10]+' belas':n<100?sa[Math.floor(n/10)]+' puluh'+(n%10?' '+sa[n%10]:''):n===100?'seratus':String(n);
@@ -225,7 +267,7 @@ $('#xf').onchange=ev=>{if(needX())return;const kl=$('#xk').value,fl=ev.target.fi
 rows.forEach(r=>{const nama=g(r,'nama','nama santri','nama lengkap');if(!nama)return;const d={nama,nis:g(r,'nis'),nisn:g(r,'nisn'),jk:/^p/i.test(g(r,'jenis kelamin','jk'))?'Perempuan':'Laki-laki',ttl:g(r,'tempat tanggal lahir','ttl','tempat, tanggal lahir'),wali:g(r,'orang tua/wali','orang tua','wali','nama wali'),kelas:kl};const ex=d.nis&&S.santri.find(x=>x.nis===d.nis&&x.kelas===kl);if(ex){Object.assign(ex,d);upd++}else{S.santri.push({id:uid(),...d});add++}});save();sel.kelas=kl;views.santri();$('#xm').textContent=`Selesai: ${add} santri ditambahkan dan ${upd} diperbarui di kelas ${kl}.`}catch(x){$('#xm').textContent='Berkas tidak bisa dibaca. Gunakan templat Excel.'}};fr.readAsArrayBuffer(fl)};if($('#bc'))$('#bc').onclick=()=>{edit='';views.santri()};
 V.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{edit=b.dataset.e;views.santri();scrollTo(0,0)});
 V.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const s=S.santri.find(x=>x.id===b.dataset.d);if(confirm(`Hapus ${s.nama}? Nilainya ikut terhapus.`)){S.santri=S.santri.filter(x=>x.id!==s.id);save();views.santri()}})},
-mapel(){V.innerHTML=`<div class="card"><h2>Mata pelajaran</h2><p class="mute">Atur nama (Indonesia dan Arab), kelompok, dan KKM. Perubahan tersimpan otomatis.</p><div class="scroll"><table class="t"><tr><th>Nama (Indonesia)</th><th>Nama (Arab)</th><th>Kelompok</th><th>KKM</th><th></th></tr>${S.mapel.map(m=>`<tr><td><input data-m="${m.id}.nama" value="${esc(m.nama)}"></td><td><input dir="rtl" lang="ar" data-m="${m.id}.ar" value="${esc(m.ar)}"></td><td><select data-m="${m.id}.kat">${Object.entries(KAT).map(([v,l])=>`<option value="${v}" ${v===m.kat?'selected':''}>${l}</option>`).join('')}</select></td><td><input type="number" min="0" max="100" style="width:80px" data-m="${m.id}.kkm" value="${m.kkm}"></td><td><button class="del" data-d="${m.id}">Hapus</button></td></tr>`).join('')}</table></div><p><button id="am">Tambah mata pelajaran</button></p></div>`;
+mapel(){V.innerHTML=`<div class="card"><h2>Mata pelajaran</h2><p class="mute">Atur nama (Indonesia dan Arab), kelompok, dan KKM. Perubahan tersimpan otomatis.</p><div class="scroll"><table class="t"><tr><th>Nama (Indonesia)</th><th>Nama (Arab)</th><th>Kelompok</th><th>KKM</th><th></th></tr>${S.mapel.map(m=>`<tr><td><input data-m="${m.id}.nama" value="${esc(m.nama)}"></td><td><input dir="rtl" lang="ar" style="font-family:Amiri,serif;font-size:17px;text-align:right" data-m="${m.id}.ar" value="${esc(m.ar)}"></td><td><select data-m="${m.id}.kat">${Object.entries(KAT).map(([v,l])=>`<option value="${v}" ${v===m.kat?'selected':''}>${l}</option>`).join('')}</select></td><td><input type="number" min="0" max="100" style="width:80px" data-m="${m.id}.kkm" value="${m.kkm}"></td><td><button class="del" data-d="${m.id}">Hapus</button></td></tr>`).join('')}</table></div><p><button id="am">Tambah mata pelajaran</button></p></div>`;
 V.oninput=ev=>{const d=ev.target.dataset.m;if(d){const[i,k]=d.split('.');S.mapel.find(m=>m.id===i)[k]=k==='kkm'?+ev.target.value:ev.target.value;save()}};
 $('#am').onclick=()=>{S.mapel.push({id:uid(),nama:'Mata pelajaran baru',ar:'',kat:'Nasional',kkm:70});save();views.mapel()};
 V.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{if(confirm('Hapus mata pelajaran ini?')){S.mapel=S.mapel.filter(m=>m.id!==b.dataset.d);save();views.mapel()}})},
@@ -259,7 +301,7 @@ function sheet(s){const r=S.nilai[key(s.id)]||{},n=r.n||{},k=r.s||{},a=r.a||{},x
 const bi=(p,q)=>`${p} / <span class="ar">${q}</span>`,pl=h=>h?bi(SK[h],AK[h]):'',val=m=>{const v=n[m.id]||{};return num(v.v)??avg([num(v.p),num(v.k)])};
 const hf=z=>z==null?'':`<span style="text-transform:capitalize">${tb(z)}</span> / <span class="ar">${ta(z)}</span>`;
 let b='',tot=[];
-const grp=(kat,head,lab)=>{const ms=S.mapel.filter(m=>m.kat===kat);if(!ms.length)return;b+=`<tr class="g"><td colspan="6">${head}</td></tr>`;ms.forEach((m,i)=>{const v=val(m),z=v==null?null:Math.round(v);if(v!=null)tot.push(v);b+=`<tr><td>${lab(i)}</td><td class="l">${bi(esc(m.nama),esc(m.ar||''))}</td><td>${m.kkm}</td><td>${f(z)}</td><td class="hf">${hf(z)}</td><td class="kt">${z==null?'':z>=m.kkm?bi('Tuntas','مكتمل'):bi('Belum tuntas','غير مكتمل')}</td></tr>`})};
+const grp=(kat,head,lab)=>{const ms=S.mapel.filter(m=>m.kat===kat);if(!ms.length)return;b+=`<tr class="g"><td colspan="6">${head}</td></tr>`;ms.forEach((m,i)=>{const v=val(m),z=v==null?null:Math.round(v);if(v!=null)tot.push(v);b+=`<tr><td>${lab(i)}</td><td class="l">${bi(esc(m.nama),esc(m.ar||''))}</td><td><span class="ar" lang="ar" dir="rtl">${arNum(m.kkm)}</span></td><td>${f(z)}</td><td class="hf">${hf(z)}</td><td class="kt">${z==null?'':z>=m.kkm?bi('Tuntas','مكتمل'):bi('Belum tuntas','غير مكتمل')}</td></tr>`})};
 grp('Nasional',bi('A. KURIKULUM NASIONAL','مقرر الحكومية'),i=>i+1);b+=`<tr class="g"><td colspan="6">${bi('B. KURIKULUM PESANTREN','مقرر المعهد')}</td></tr>`;
 grp('Keagamaan',bi('1. Ilmu-Ilmu Keagamaan','علوم الدينية'),i=>String.fromCharCode(97+i)+'.');grp('Bahasa',bi('2. Ilmu-Ilmu Bahasa','علوم اللغة'),i=>String.fromCharCode(97+i)+'.');
 const sum=Math.round(tot.reduce((p,q)=>p+q,0)),mn=tot.length?Math.round(sum/tot.length):null;
