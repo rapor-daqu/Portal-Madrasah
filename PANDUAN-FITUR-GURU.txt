@@ -1,0 +1,35 @@
+PANDUAN FITUR GURU – PORTAL MTSS PON-PES DARUL QUR'AN
+
+1. Login administrator
+   Username awal: admin
+   Password awal: admin123
+   (Jika sebelumnya sudah diganti, gunakan kredensial yang tersimpan pada browser tersebut.)
+
+2. Membuat akun guru
+   - Login sebagai administrator.
+   - Buka menu Akun Guru.
+   - Isi nama guru, username, password, mata pelajaran, dan kelas yang diajar.
+   - Simpan akun. Buat akun terpisah untuk kombinasi mapel/kelas lain yang diajar guru yang sama.
+
+3. Login guru
+   - Dari halaman login admin, pilih Login Guru.
+   - Masukkan username dan password yang dibuat administrator.
+   - Guru hanya melihat kelas dan mata pelajaran yang ditugaskan pada akun tersebut.
+
+4. Unggah nilai Excel
+   - Klik Unduh Template Excel.
+   - Isi kolom Nilai (0–100). Jangan mengubah judul kolom NIS, NISN, Nama Santri, dan Nilai.
+   - Unggah kembali file Excel.
+   - Data santri dicocokkan menggunakan NIS, atau NISN jika NIS kosong. Nilai hanya diperbarui untuk mapel dan kelas pada akun guru.
+
+5. Bahasa Arab
+   - Nama Arab tiap mata pelajaran dapat diperiksa dan diubah pada menu Mata Pelajaran.
+   - Nama Indonesia dan Arab ditampilkan berdampingan pada raport.
+
+6. Cetak raport
+   - Buka Cetak Raport, pilih kelas/santri, lalu Cetak / Simpan PDF.
+   - Pada dialog cetak pilih kertas A4, skala 100% / ukuran sebenarnya, dan nonaktifkan header/footer browser bila tersedia.
+   - Area pengelolaan portal tidak dicetak; setiap raport disusun dalam dua lembar A4.
+
+CATATAN PENTING TENTANG PENYIMPANAN DAN KEAMANAN
+Versi ZIP ini masih merupakan aplikasi HTML statis yang menyimpan data dengan localStorage di browser/perangkat. Akun guru dan nilai yang diunggah hanya tersedia pada browser/perangkat yang sama dan tidak otomatis tersinkron ke guru lain atau perangkat lain. Password juga belum dikelola oleh server. Karena itu fitur login guru ini merupakan alur lokal/pratinjau, bukan autentikasi aman untuk operasional publik. Agar guru dapat login dari HP masing-masing dan berbagi data secara online, portal harus dihubungkan ke backend/database (misalnya Supabase) dengan autentikasi dan aturan akses per guru.
