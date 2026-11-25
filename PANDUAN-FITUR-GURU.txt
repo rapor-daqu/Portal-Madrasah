@@ -33,3 +33,11 @@ PANDUAN FITUR GURU – PORTAL MTSS PON-PES DARUL QUR'AN
 
 CATATAN PENTING TENTANG PENYIMPANAN DAN KEAMANAN
 Versi ZIP ini masih merupakan aplikasi HTML statis yang menyimpan data dengan localStorage di browser/perangkat. Akun guru dan nilai yang diunggah hanya tersedia pada browser/perangkat yang sama dan tidak otomatis tersinkron ke guru lain atau perangkat lain. Password juga belum dikelola oleh server. Karena itu fitur login guru ini merupakan alur lokal/pratinjau, bukan autentikasi aman untuk operasional publik. Agar guru dapat login dari HP masing-masing dan berbagi data secara online, portal harus dihubungkan ke backend/database (misalnya Supabase) dengan autentikasi dan aturan akses per guru.
+
+
+FITUR PROFIL GURU:
+Admin membuka menu Akun Guru, lalu mengisi nama, foto, jabatan/peran, dan keterangan. Profil akan tampil pada menu publik Profil Guru. Jabatan tersedia: Kepala Madrasah, WKM Kurikulum, WKM Kesiswaan, Wali Kelas, Guru Mata Pelajaran, Guru Tahfizh, dan Guru.
+
+
+FITUR PROFIL PRIBADI GURU:
+Setelah login, setiap guru dan wali kelas masuk ke halaman pribadinya. Pada bagian Data Pribadi dan Foto Profil, masing-masing dapat memperbarui nama, foto profil, jabatan, NIP/NIY, email, nomor HP, serta keterangan/biodata singkat. Perubahan hanya berlaku pada akun yang sedang login. Profil publik mengambil data dari profil akun tersebut. Akun wali kelas tanpa penugasan mata pelajaran tetap dapat masuk dan mengelola profil pribadi.
